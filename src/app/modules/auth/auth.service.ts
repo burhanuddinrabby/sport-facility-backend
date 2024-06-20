@@ -7,9 +7,14 @@ import { isPasswordMatched } from "./auth.util";
 
 const signup = async (payload: TUser) => {
     // check user existance
-    const user = await User.findOne({ email: payload.email });
-    if (user) {
-        throw new Error("User Already Exists!");
+    const userEmailExist = await User.findOne({ email: payload.email });
+    if (userEmailExist) {
+        throw new Error("User email already exists!");
+    }
+
+    const userPhoneExist = await User.findOne({ phone: payload.phone });
+    if (userPhoneExist) {
+        throw new Error("Phone number is already taken!");
     }
 
     const result = await User.create(payload);
@@ -18,16 +23,17 @@ const signup = async (payload: TUser) => {
 
 const login = async (payload: TLoginUser) => {
     // check user existance
-    const user = await User.findOne({ email: payload.email }).select("+password");
     // console.log(!user)
-    if (!user) {
+    if (! await User.isUserExist(payload.email)) {
         throw new Error("User Not Found!");
     }
+    // const user: TUser = await User.findOne({ email: payload.email }).select("+password");
+    const user: TUser = await User.isUserExist(payload.email);
 
     // check password is matched or not
     const passwordMatch = await isPasswordMatched(
         payload.password,
-        user.password
+        user?.password as string
     );
 
     if (!passwordMatch) {
@@ -36,8 +42,8 @@ const login = async (payload: TLoginUser) => {
 
     // jwt payload create
     const jwtPayload = {
-        email: user.email,
-        role: user.role,
+        email: user?.email,
+        role: user?.role,
     };
 
     const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
@@ -55,7 +61,7 @@ const login = async (payload: TLoginUser) => {
     return {
         accessToken,
         refreshToken,
-        user
+        user: await User.findOne({ email: payload.email })
     };
 };
 

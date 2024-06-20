@@ -9,7 +9,7 @@ const signupController = catchAsync(async (req, res) => {
     res.status(200).json({
         success: true,
         statusCode: 200,
-        message: "User Registered Successfully",
+        message: "User registered successfully",
         data: result,
     });
 });
@@ -19,7 +19,7 @@ const loginController = catchAsync(async (req, res) => {
     // console.log("result from login", result)
 
     const { accessToken, refreshToken, user } = result
-
+    // user.password = ''
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -30,7 +30,7 @@ const loginController = catchAsync(async (req, res) => {
     res.status(200).json({
         success: true,
         statusCode: 200,
-        message: "User Logged In Successfully",
+        message: "User logged in successfully",
         token: accessToken,
         data: user,
     });

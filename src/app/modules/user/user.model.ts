@@ -2,8 +2,9 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
-import { TUser } from './user.interface';
-const userSchema = new Schema<TUser>({
+import { TUser, UserModelInterface } from './user.interface';
+
+const userSchema = new Schema<TUser, UserModelInterface>({
   name: {
     type: String,
     required: true
@@ -15,7 +16,8 @@ const userSchema = new Schema<TUser>({
   },
   password: {
     type: String,
-    required: [true, "password must be 8 characters"]
+    required: true,
+    select: 0
   },
   phone: {
     type: String,
@@ -50,4 +52,8 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-export const User = model<TUser>('User', userSchema);
+userSchema.statics.isUserExist = async function (email: string) {
+  return await this.findOne({ email }).select('+password');
+}
+
+export const User = model<TUser, UserModelInterface>('User', userSchema);
