@@ -1,10 +1,14 @@
+import httpStatus from "http-status";
+import AppError from "../../errors/AppError";
 import catchAsync from "../../utils/catchAsync";
-
 import { facilitiesServices } from "./facilities.service";
 
 const createFacility = catchAsync(async (req, res) => {
-  
   const result = await facilitiesServices.createFacilityIntoDB(req.body);
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Failed to add facility");
+  }
 
   res.status(200).json({
     success: true,
@@ -15,66 +19,50 @@ const createFacility = catchAsync(async (req, res) => {
 });
 
 const getAllFacility = catchAsync(async (req, res) => {
-  try {
-    const result = await facilitiesServices.getAllFacilityFromDB();
+  const result = await facilitiesServices.getAllFacilityFromDB();
+
+  if (result.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, "No facilities were found");
+  }
 
   res.status(200).json({
     success: true,
     statusCode: 200,
-    message: "All Facilities retrieved Successfully",
+    message: "Facilities retrieved successfully",
     data: result,
   });
-    
-  } catch (error) {
-    res.status(200).json({
-      success: false,
-      statusCode: 404,
-      message: "No Data Found",
-      data: [],
-    });
-  }
 });
 
 const updateFacility = catchAsync(async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await facilitiesServices.updateFacilityIntoDB(id, req.body);
+  const { id } = req.params;
+  const result = await facilitiesServices.updateFacilityIntoDB(id, req.body);
 
-    res.status(200).json({
-      success: true,
-      statusCode: 200,
-      message: " Facilities updated Successfully",
-      data: result,
-    });
-  } catch (error) {
-    res.status(200).json({
-      success: false,
-      statusCode: 404,
-      message: "No Data Found",
-      data: [],
-    });
-}
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Failed to update facility");
+  }
+
+  res.status(200).json({
+    success: true,
+    statusCode: 200,
+    message: " Facility updated Successfully",
+    data: result,
+  });
 });
-const deleteFacility = catchAsync(async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await facilitiesServices.delteFacilityFromDB(id);
 
-    res.status(200).json({
-      success: true,
-      statusCode: 200,
-      message: " Facilities Deleted Successfully",
-      data: result,
-    });
-  } catch (error) {
-        res.status(200).json({
-        success: false,
-        statusCode: 404,
-        message: " Failed to delete facilities !",
-        
-        
-  })
-}
+const deleteFacility = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await facilitiesServices.deleteFacilityFromDB(id);
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Failed to delete facility");
+  }
+
+  res.status(200).json({
+    success: true,
+    statusCode: 200,
+    message: "Facility deleted successfully",
+    data: result,
+  });
 });
 
 export const facilitiesController = {
