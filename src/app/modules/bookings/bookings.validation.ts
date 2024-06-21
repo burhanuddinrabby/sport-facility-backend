@@ -14,13 +14,13 @@ const createBookingValidation = z.object({
         }),
         user:z.string({
             required_error:"User is required"
-        }),
+        }).optional(),
         facility:z.string({
             required_error:"Facility is required"
         }),
         payableAmount:z.number({
             required_error:"Payable amount is required"
-        }),
+        }).optional(),
         isBooked:z.enum(['confirmed', "unconfirmed", "canceled"]).optional()
     })
 })

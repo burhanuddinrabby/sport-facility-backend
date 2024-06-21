@@ -4,10 +4,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
 import globalErrorHandler from './app/middlewares/globalErrorhandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
+import AppError from './app/errors/AppError';
 
 const app: Application = express();
 
@@ -16,6 +17,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: ['http://localhost:5173'] }));
 
+app.get('/', (req: Request, res: Response) => {
+    res.send('Welcome to the API of sportsify');
+})
 
 // application routes
 app.use('/api', router);
@@ -23,9 +27,12 @@ app.use('/api', router);
 app.use(globalErrorHandler);
 
 //Not Found
-app.use('/', (req, res) => {
-    res.send('Welcome to the API of sportsify');
+// app.all("*",notFound);
+app.all("*", (req: Request, res: Response) => {
+    res.status(404).json({
+        success: false,
+        message: "Route not found"
+    });
 })
-app.use(notFound);
 
 export default app;

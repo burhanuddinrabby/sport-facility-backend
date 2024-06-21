@@ -1,41 +1,30 @@
-import { Facilities } from "../facility/facilities.model";
-
 import { TBooking } from "./bookings.interface"
 import { Booking } from "./bookings.model"
 
 const createBooking = async(payload:TBooking) =>{
-    const {startTime,endTime,facility} = payload
+    const isBooked = "confirmed";
+    const updatePayloadWithPayableAmount = {...payload,isBooked};
 
-    // convert time string to number
-    const startTimeHours = parseInt(startTime.split(":")[0]);
-    const endTimeHours  =parseInt(endTime.split(":")[0])
-
-    // find facility data and get per hour cost
-    const facilityData = await Facilities.findById(facility)
-    const payPerHour = facilityData? facilityData.pricePerHour : 0
-
-    const bookingHours = (endTimeHours-startTimeHours) 
-    const payableAmount = bookingHours * payPerHour
-    // console.log("payableAmount",payableAmount)
-
-    const isBooked = "confirmed"
-
-    const updatePayloadWithPayableAmount = {...payload,payableAmount,isBooked}
-
-    const result = (await Booking.create(updatePayloadWithPayableAmount)).populate("user")
-    return result
+    const result = (await (await Booking.create(updatePayloadWithPayableAmount)).populate("user")).populate("facility") 
+    return result;
 
 }
 const getAllBooking = async() =>{
-    const result = await Booking.find().populate("facility").populate("user")
-    return result
-
+    const result = await Booking.find().populate("facility").populate("user");
+    return result;
 }
-const getSingleUserBookings = async(id:string) =>{
-    // console.log(id ,"i am from service")
-    const result = await Booking.find({user: id})
+
+const getBookingsFromFacility = async(id:string) =>{
+    const result = await Booking.find({facility:id})
     return result
-    // console.log(result,"from single user data get service")
+}
+
+const getSingleUserBookings = async(id:string) =>{
+    const result = await Booking.find({
+        user: id,
+        isBooked: { $ne: "canceled" }
+    })
+    return result;
 }
 
 const deleteBookings = async(id:string) =>{
@@ -44,7 +33,6 @@ const deleteBookings = async(id:string) =>{
 }
 
 const checkSlots = async(date:string) =>{
-    // console.log("check kar",date)
     const avaiableSlots = []
 
     // define start and end of the day in 24 hr formate: convert minute for match with bookings time 
@@ -118,5 +106,6 @@ export const bookingServices = {
     getAllBooking,
     deleteBookings,
     getSingleUserBookings,
-    checkSlots
+    checkSlots,
+    getBookingsFromFacility
 }

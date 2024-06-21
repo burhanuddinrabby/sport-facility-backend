@@ -12,13 +12,13 @@ export const auth = (...requiredRoles: TUser_Role[]) => {
     const tokenWithBearer = req.headers.authorization;
 
     if (!tokenWithBearer) {
-      throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!")
+      throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
     }
     if (tokenWithBearer) {
       const token = tokenWithBearer.split(" ")[1]
 
       if (!token) {
-        throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!")
+        throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
       }
 
       const verifiedToken = jwt.verify(token as string, config.jwt_access_secret as string)
@@ -33,7 +33,7 @@ export const auth = (...requiredRoles: TUser_Role[]) => {
       }
 
       if (requiredRoles && !requiredRoles.includes(role)) {
-        throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!")
+        throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
       }
     }
     next()
