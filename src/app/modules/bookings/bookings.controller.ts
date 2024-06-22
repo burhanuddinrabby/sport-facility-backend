@@ -10,9 +10,10 @@ import httpStatus from "http-status";
 import { makeDateString } from "./booking.utils";
 
 const createBookingController = catchAsync(async (req, res) => {
-  //date yyyy-mm-dd format 0000-00-00
-  req.body.date = makeDateString(req.body.date);
-  
+  //creating date into yyyy-mm-dd format padding 0000-00-00
+  const [year, month, day] = (req.body.date as string).split('-').map(Number);
+  req.body.date = makeDateString(new Date(year, month - 1, day));
+   
   const tokenWithBearer = req.headers.authorization as string;
   const token = tokenWithBearer.split(" ")[1];
 
