@@ -1,5 +1,5 @@
-# Sports Facility Booking Platform
-## Sportsify application backend
+# Sportsify application backend
+## Sports Facility Booking Platform
 
 ## Technology Used in this application:
 

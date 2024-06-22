@@ -6,12 +6,13 @@ import jwt from "jsonwebtoken";
 import { isPasswordMatched } from "./auth.util";
 
 const signup = async (payload: TUser) => {
-    // check user existance
+    // if user email already exists
     const userEmailExist = await User.findOne({ email: payload.email });
     if (userEmailExist) {
         throw new Error("User email already exists!");
     }
 
+    // if phone number already exists
     const userPhoneExist = await User.findOne({ phone: payload.phone });
     if (userPhoneExist) {
         throw new Error("Phone number is already taken!");
@@ -22,12 +23,12 @@ const signup = async (payload: TUser) => {
 };
 
 const login = async (payload: TLoginUser) => {
-    // check user existance
-    // console.log(!user)
+    // check user exist or not
     if (! await User.isUserExist(payload.email)) {
         throw new Error("User Not Found!");
     }
-    // const user: TUser = await User.findOne({ email: payload.email }).select("+password");
+    
+    // get user details
     const user: TUser = await User.isUserExist(payload.email);
 
     // check password is matched or not
@@ -36,11 +37,12 @@ const login = async (payload: TLoginUser) => {
         user?.password as string
     );
 
+    //error for incorrect password
     if (!passwordMatch) {
         throw new Error("Password not matched!");
     }
 
-    // jwt payload create
+    // jwt payload
     const jwtPayload = {
         email: user?.email,
         role: user?.role,

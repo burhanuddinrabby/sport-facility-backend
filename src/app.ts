@@ -18,6 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: ['http://localhost:5173'] }));
 
+//root
 app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to the API of sportsify');
 })
@@ -28,7 +29,6 @@ app.use('/api', router);
 app.use(globalErrorHandler);
 
 //Not Found
-// app.all("*",notFound);
 app.all("*", (req: Request, res: Response) => {
     res.status(404).json({
         success: false,

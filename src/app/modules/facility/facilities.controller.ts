@@ -21,6 +21,7 @@ const createFacility = catchAsync(async (req, res) => {
 const getAllFacility = catchAsync(async (req, res) => {
   const result = await facilitiesServices.getAllFacilityFromDB();
 
+  //if date is empty then error message
   if (result.length === 0) {
     throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
   }
@@ -37,6 +38,7 @@ const updateFacility = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await facilitiesServices.updateFacilityIntoDB(id, req.body);
 
+  //if date is empty then error message
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, "Failed to update facility");
   }

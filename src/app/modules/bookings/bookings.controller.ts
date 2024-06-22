@@ -12,8 +12,9 @@ import { makeDateString } from "./booking.utils";
 const createBookingController = catchAsync(async (req, res) => {
   //creating date into yyyy-mm-dd format padding 0000-00-00
   const [year, month, day] = (req.body.date as string).split('-').map(Number);
-  req.body.date = makeDateString(new Date(year, month - 1, day));
-   
+  req.body.date = makeDateString(new Date(year, month - 1, day));//date reformation
+  
+  //middleware passed then no need to check token validation again
   const tokenWithBearer = req.headers.authorization as string;
   const token = tokenWithBearer.split(" ")[1];
 
@@ -32,6 +33,7 @@ const createBookingController = catchAsync(async (req, res) => {
   const startTimeHours = parseInt(req.body?.startTime.split(":")[0]);
   const endTimeHours = parseInt(req.body?.endTime.split(":")[0])
 
+  // probable errors
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const checkSameTimeSlot = bookingDataCheckTime.map((time) => {
     const bookedStartTimeHours = parseInt(time.startTime.split(":")[0]);
@@ -44,6 +46,7 @@ const createBookingController = catchAsync(async (req, res) => {
       throw new AppError(httpStatus.BAD_REQUEST, "End time can't be less than start time")
     }
   })
+
   const facilityData = await facilitiesServices.getSingleFacilityFromDB(req.body?.facility)
   const payPerHour = facilityData ? facilityData.pricePerHour : 0
 
@@ -106,7 +109,6 @@ const getSingleBookingController = catchAsync(async (req, res) => {
 
 const deleteBookingController = catchAsync(async (req, res) => {
   const { id } = req.params;
-
   const result = await bookingServices.deleteBookings(id);
 
   res.status(200).json({
@@ -119,12 +121,14 @@ const deleteBookingController = catchAsync(async (req, res) => {
 
 const checkAvailability = catchAsync(async (req, res) => {
   if(req.query?.date){
+    // if query date exist then reformat the date
     const [year, month, day] = (req.query.date as string).split('-').map(Number);
     req.query.date = makeDateString(new Date(year, month - 1, day));
+  }else{
+    req.query.date = makeDateString(new Date());
   }
-  const date = req.query?.date ? req.query.date : makeDateString(new Date());
 
-  const result = await bookingServices.checkSlots(date as string);
+  const result = await bookingServices.checkSlots(req.query.date as string);
   res.status(200).json({
     success: true,
     statusCode: 200,

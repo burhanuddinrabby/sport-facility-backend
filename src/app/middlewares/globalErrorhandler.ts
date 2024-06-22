@@ -9,10 +9,11 @@ import handleDuplicateError from '../errors/handleDuplicateError';
 import handleValidationError from '../errors/handleValidationError';
 import handleZodError from '../errors/handleZodError';
 import { TErrorSources } from '../interface/error';
+import httpStatus from 'http-status';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   //setting default values
-  let statusCode = 500;
+  let statusCode : number = httpStatus.INTERNAL_SERVER_ERROR;
   let message = 'Something went wrong!';
   let errorSources: TErrorSources = [
     {
@@ -22,21 +23,28 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   ];
 
   if (err?.name === 'ValidationError') {
+    // validation error
     const simplifiedError = handleValidationError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+
   } else if (err?.name === 'CastError') {
+    //cast error from mongoose
     const simplifiedError = handleCastError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+
   } else if (err?.code === 11000) {
+    //duplicate error from mongoose
     const simplifiedError = handleDuplicateError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+
   } else if (err instanceof AppError) {
+    //custom error
     statusCode = err?.statusCode;
     message = err.message;
     errorSources = [
@@ -46,6 +54,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
       },
     ];
   } else if (err instanceof Error) {
+    //general error
     message = err.message;
     errorSources = [
       {
@@ -56,18 +65,18 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   }
 
   if (err instanceof ZodError) {
+    //zod error
     const simplifiedError = handleZodError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
   }
   
-  //ultimate return
+  //returning the response
   return res.status(statusCode).json({
     success: false,
     message,
     errorSources,
-    // err,
     stack: config.NODE_ENV === 'development' ? err?.stack : null,
   });
 };

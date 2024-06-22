@@ -2,7 +2,7 @@ import config from "../../config";
 import catchAsync from "../../utils/catchAsync";
 import { authServices } from "./auth.service";
 
-
+//signup controller
 const signupController = catchAsync(async (req, res) => {
     const result = await authServices.signup(req.body);
 
@@ -13,14 +13,14 @@ const signupController = catchAsync(async (req, res) => {
         data: result,
     });
 });
+
+//login controller
 const loginController = catchAsync(async (req, res) => {
 
     const result = await authServices.login(req.body);
-    // console.log("result from login", result)
+    const { accessToken, refreshToken, user } = result;
 
-    const { accessToken, refreshToken, user } = result
-    // user.password = ''
-
+    //setting the refresh token in cookie
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: config.NODE_ENV === 'production'

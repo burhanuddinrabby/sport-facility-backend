@@ -15,27 +15,27 @@ export const auth = (...requiredRoles: TUser_Role[]) => {
     if (!tokenWithBearer) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
     }
-    if (tokenWithBearer) {
-      const token = tokenWithBearer.split(" ")[1]
 
-      if (!token) {
-        throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
-      }
+    //splitting the token 
+    const token = tokenWithBearer.split(" ")[1]
 
-      const verifiedToken = jwt.verify(token as string, config.jwt_access_secret as string)
+    if (!token) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
+    }
 
-      const { role, email } = verifiedToken as JwtPayload
+    const verifiedToken = jwt.verify(token as string, config.jwt_access_secret as string)
 
-      // check user exist in database or not
+    const { role, email } = verifiedToken as JwtPayload
 
-      const user = await User.findOne({ email })
-      if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, "User not found!")
-      }
+    // check user exist in database or not
 
-      if (requiredRoles && !requiredRoles.includes(role)) {
-        throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
-      }
+    const user = await User.findOne({ email })
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found!")
+    }
+
+    if (requiredRoles && !requiredRoles.includes(role)) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
     }
     next()
   })
