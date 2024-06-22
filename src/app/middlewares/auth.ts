@@ -11,6 +11,7 @@ export const auth = (...requiredRoles: TUser_Role[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const tokenWithBearer = req.headers.authorization;
 
+    //if the token not found the no access
     if (!tokenWithBearer) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You have no access to this route")
     }
