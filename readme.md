@@ -7,8 +7,10 @@
 *   Web Framework: **Express.js**
 *   ODM & Validation Library: **Mongoose for MongoDB**
 
-### Models:
+### For server side url [click here](https://sportsify-server.vercel.app/) 
+or visit [https://sportsify-server.vercel.app/](https://sportsify-server.vercel.app/)
 
+### Models:
 **User Model:**
 
 *   `name`: *string*
