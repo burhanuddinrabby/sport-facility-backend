@@ -64,7 +64,9 @@ const createBookingController = catchAsync(async (req, res) => {
 
 const getAllBookingController = catchAsync(async (req, res) => {
   const result = await bookingServices.getAllBooking();
-
+  if(result.length === 0){
+    throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
+  }
   res.status(200).json({
     success: true,
     statusCode: 200,
@@ -91,7 +93,9 @@ const getSingleBookingController = catchAsync(async (req, res) => {
   const userId = user?._id.toString() as string;
 
   const result = await bookingServices.getSingleUserBookings(userId);
-  // console.log("result from controller boking", result);
+  if (result.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
+  }
   res.status(200).json({
     success: true,
     statusCode: 200,

@@ -9,6 +9,7 @@ import globalErrorHandler from './app/middlewares/globalErrorhandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
 import AppError from './app/errors/AppError';
+import httpStatus from 'http-status';
 
 const app: Application = express();
 
@@ -31,7 +32,8 @@ app.use(globalErrorHandler);
 app.all("*", (req: Request, res: Response) => {
     res.status(404).json({
         success: false,
-        message: "Route not found"
+        statusCode: httpStatus.NOT_FOUND,
+        message: "Not Found"
     });
 })
 
