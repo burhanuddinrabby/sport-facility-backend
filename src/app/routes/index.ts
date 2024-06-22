@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authRouter } from '../modules/auth/auth.route';
 import { facilitiesRouter } from '../modules/facility/facilities.route';
 import { bookingRoute } from '../modules/bookings/bookings.route';
+import { bookingControllers } from '../modules/bookings/bookings.controller';
 
 const router = Router();
 
@@ -17,6 +18,10 @@ const moduleRoutes = [
   {
     path: "/bookings",
     route: bookingRoute
+  },
+  {
+    path: "/check-availability",
+    route: bookingControllers.checkAvailability
   }
 ];
 
