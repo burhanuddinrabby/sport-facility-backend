@@ -22,7 +22,7 @@ const getAllFacility = catchAsync(async (req, res) => {
   const result = await facilitiesServices.getAllFacilityFromDB();
 
   if (result.length === 0) {
-    throw new AppError(httpStatus.NOT_FOUND, "No facilities were found");
+    throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
   }
 
   res.status(200).json({
